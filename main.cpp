@@ -6,7 +6,11 @@ int main() {
     std::cout << "Enter the log-file path: ";
     std::cin >> logFilePath;
 
-    LogReader log(logFilePath, 88);
+    unsigned short logFilePort;
+    std::cout << "Enter the log-file port: ";
+    std::cin >> logFilePort;
+
+    LogReader log(logFilePath, logFilePort);
     log.start();
 
     return 0;
