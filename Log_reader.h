@@ -14,6 +14,7 @@ private:
     void reading_until_err();
     void asyncSend();
     void sendToServer(const boost::system::error_code&);
+    void stopper();
 
 public:
     LogReader(std::string pathToLogFile,  unsigned short serv_port):

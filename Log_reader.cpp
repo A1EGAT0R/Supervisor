@@ -4,17 +4,35 @@
 const size_t EOF_SLEEP_SEC = 60;
 
 void
+LogReader::stopper()
+{
+    std::string input;
+
+    std::cout << "Enter '#stop', for stop the program: ";
+    std::cin >> input;
+    while(input != "#stop") {
+        std::cout << "Wrong command.\n"
+                     "Enter '#stop', for stop the program: ";
+        std::cin >> input;
+    }
+
+    std::cout << "\nWait, please.\n";
+
+    isWorked = false;
+    io.stop();
+}
+
+void
 LogReader::start()
 {
     if(!ist) return;
 
+    boost::thread([&](){ stopper(); }).detach();
+
     asyncSend();
-    boost::thread th([&]()
-                     {
-                        io.run();
-                     });
+    boost::thread([&](){ io.run(); }).detach();
+
     reading_until_err();
-    th.join();
 }
 
 void
@@ -23,7 +41,7 @@ LogReader::reading_until_err()
     while(isWorked) {
         ist.open(pathToLogFile);
         ist.seekg(readPos);
-        while (!ist.eof()) {
+        while ( !(ist.eof()) && (isWorked) ) {
             std::string read;
             std::getline(ist, read);
 
@@ -51,7 +69,6 @@ LogReader::asyncSend()
 {
         acceptor.async_accept(sock, [&](const boost::system::error_code& err)
         {
-            std::cout << "CONGRAT\n";
             std::unique_lock<std::mutex> u_newLogWaiter(newLogWaiter);
             while(true) {
                 while (isWorked) {
