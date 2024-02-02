@@ -6,7 +6,7 @@ set(Boost_USE_STATIC_LIBS OFF)
 set(Boost_USE_MULTITHREADED ON)
 set(Boost_USE_STATIC_RUNTIME OFF)
 
-find_package(Boost COMPONENTS thread system chrono)
+find_package(Boost COMPONENTS thread chrono system)
 
 include_directories(${Boost_INCLUDE_DIRS})
 

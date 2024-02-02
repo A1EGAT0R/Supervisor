@@ -69,6 +69,7 @@ LogReader::asyncSend()
 {
         acceptor.async_accept(sock, [&](const boost::system::error_code& err)
         {
+            std::cout << "CONGRAT\n";
             std::unique_lock<std::mutex> u_newLogWaiter(newLogWaiter);
             while(true) {
                 while (isWorked) {
@@ -89,6 +90,7 @@ LogReader::sendToServer(const boost::system::error_code& err)
         sock.async_write_some(boost::asio::buffer(outputLogs.front() + '\n'),
                               [&](const boost::system::error_code &err, std::size_t sz)
                               {
+            std::cout << "SCS\n";
                               });
         outputLogs.pop();
     }
