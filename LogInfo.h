@@ -11,18 +11,6 @@ class LogInfo
 
 public:
 
-    enum error_types
-    {
-        TRACE = 0,
-        DEBUG,
-        INFO,
-        WARN,
-        ERROR,
-        FATAL
-    };
-    static constexpr std::array string_error_types = {"TRACE", "DEBUG", "INFO", "WARN", "ERROR", "FATAL"};
-
-
     LogInfo(std::string dt_tm, std::string err, std::string plc):
             date_time(std::move(dt_tm)),
             error_type(std::move(err)),
@@ -61,7 +49,7 @@ public:
 
     std::string getTime() const noexcept
     {return date_time;}
-    std::string getError() const noexcept
+    std::string getLevel() const noexcept
     {return error_type;}
     std::string getMess() const noexcept
     {return mess;}

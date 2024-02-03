@@ -17,17 +17,19 @@ private:
     void stopper();
 
 public:
-    LogReader(std::string pathToLogFile,  unsigned short serv_port):
+    LogReader(std::string pathToLogFile,  unsigned short serv_port, const std::vector<std::string>& crv):
                                 ep(boost::asio::ip::tcp::v4(), serv_port),
                                 sock(io),
                                 isWorked(true),
                                 readPos(0),
-                                acceptor(io, ep)
+                                acceptor(io, ep),
+                                critical_value(crv)
                                 {
                                     this->pathToLogFile = std::move(pathToLogFile);
                                 }
 
 
+    bool is_critical_value(const std::string&);
     void start();
     ~LogReader(){
         io.run();
@@ -44,6 +46,7 @@ private:
     std::ifstream ist;
     std::string pathToLogFile;
     std::queue<std::string> outputLogs;
+    std::vector<std::string> critical_value;
     int readPos;
     bool isWorked;
 

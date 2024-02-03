@@ -1,7 +1,7 @@
 #include "Log_reader.h"
 #include <boost/bind.hpp>
 #include <iostream>
-const size_t EOF_SLEEP_SEC = 60;
+const size_t EOF_SLEEP_SEC = 5;
 
 void
 LogReader::stopper()
@@ -20,6 +20,14 @@ LogReader::stopper()
 
     isWorked = false;
     io.stop();
+}
+
+bool
+LogReader::is_critical_value(const std::string& value)
+{
+    auto check = std::find(critical_value.cbegin(), critical_value.cend(), value);
+
+    return (check != critical_value.cend());
 }
 
 void
@@ -50,8 +58,7 @@ LogReader::reading_until_err()
 
             LogInfo current_log(read);
 
-            bool is_error = current_log.getError() == LogInfo::string_error_types[LogInfo::ERROR]
-                            || current_log.getError() == LogInfo::string_error_types[LogInfo::FATAL];
+            bool is_error = is_critical_value(current_log.getLevel());
 
             if (is_error) {
                 outputLogs.push(current_log.getStringFormat());
@@ -69,7 +76,7 @@ LogReader::asyncSend()
 {
         acceptor.async_accept(sock, [&](const boost::system::error_code& err)
         {
-            std::cout << "CONGRAT\n";
+            std::cout << "\nCONGRAT\n";
             std::unique_lock<std::mutex> u_newLogWaiter(newLogWaiter);
             while(true) {
                 while (isWorked) {
@@ -88,9 +95,8 @@ LogReader::sendToServer(const boost::system::error_code& err)
 {
     while(!outputLogs.empty()) {
         sock.async_write_some(boost::asio::buffer(outputLogs.front() + '\n'),
-                              [&](const boost::system::error_code &err, std::size_t sz)
+                              [](const boost::system::error_code &err, std::size_t sz)
                               {
-            std::cout << "SCS\n";
                               });
         outputLogs.pop();
     }
